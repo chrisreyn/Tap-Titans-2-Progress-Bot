@@ -978,7 +978,9 @@ goto :start
 	touchUp 0
 	sleep #loadingClanQuestDelay
 	sleep 3000
-
+goto :checkClanQuestReady2
+	
+:checkClanQuestReady2
 	//check for Blue fight button lower right
 	getRGB #colorRed #colorGreen #colorBlue 390 715
 	//420 725
@@ -1007,13 +1009,6 @@ goto :start
 goto :clanQuestClose
 
 :clanQuestCheckDecks
-	if #deckSlotCount > 3
-		#deckSlotX = 115
-		#deckSlotCount = 1
-		#recheckClanQuest = 0
-		goto :clanQuestClose
-	endif
-
 	//on first run, tap on deck 1
 	//other runs, adjusted to hit appropriate deck slot
 	touchPress 0 #deckSlotX #deckSlotY
@@ -1107,7 +1102,15 @@ goto :clanQuestHitExit
 	#hitTotal = 1055
 	#deckSlotX = #deckSlotX + #deckSlotDiff * deckSlotCount
 	#deckSlotCount = #deckSlotCount + 1
-goto :clanQuestCheckDecks
+	sleep 30000
+
+	if #deckSlotCount > 3
+		#deckSlotX = 115
+		#deckSlotCount = 1
+		#recheckClanQuest = 0
+		goto :clanQuestClose
+	endif
+goto :checkClanQuestReady2
 
 :clanQuestClose
 	//is it closed already?
