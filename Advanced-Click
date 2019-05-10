@@ -1,4 +1,4 @@
-// May 10, 2019
+// May 11, 2019
 // -  Tap Titans 2 AdvancedClickBot by Tune389 [ v1.3 dev 1]
 // edited by djo5296 '17-12-30
 // now fully handled by chrisreyn
@@ -51,12 +51,13 @@ var #gear1 2
 var #gear2 1
 var #timeChangeHelm 35
 // ---------- Actions ---------- [ ClanQuest ]
-var #enableClanQuest 0
+var #enableClanQuest 1
 
-//clan boss with max possible hits
-var #clanQuestRunsPerReadyUp 3
-// 1 = (default) attack every ready up once for free
-// 2-99 = spend dias for more attacks
+var #head 1
+var #torso 1
+var #shoulders 1
+var #hands 1
+var #knees 1
 // ---------- Actions ---------- [ Heroes ]
 var #enableHeroes 1
 var #heroIntensity 2
@@ -142,7 +143,6 @@ var #randomY 0
 var #color1 0
 var #color2 0
 var #loopCount 0
-var #clanQuestLoopCount 0
 var #pressLevelUpLoopCount 0
 var #skillCheckStepper 0
 var #actionStepper 0
@@ -155,7 +155,6 @@ var #loopDetectionCount 0
 var #skillsUnlocked 0
 var #tryWithDelay 0
 var #checkRunning 0
-var #clanQuestCount 0
 var #recheckClanQuest 0
 var #count 0
 var #hitCount 0
@@ -250,6 +249,25 @@ var #resultManaPool 0
 var #resultCheckBoss 0
 var #resultUpdateTime 0
 var #resultClanQuest 0
+// ---------- Clan Raids
+var #clanBlueG -77
+var #clanBlueB -57
+var #deckSlotX 115
+var #deckSlotY 335
+var #deckSlotDiff 48
+var #deckSlotCount 1
+var #kneeL 155
+var #kneeR 325
+var #kneeY 570
+var #armL 60
+var #armR 420
+var #shoulderY 290
+var #handY 475
+var #bodyX 240
+var #headY 275
+var #torsoY 425
+var #hitCount 0
+var #hitTotal 1055
 // ---------- MAIN
 :start
 	#loopCount = #loopCount + 1
@@ -896,8 +914,11 @@ goto :start
 :checkClanQuest
 	sleep 300
 	
+	//check CQ up
 	getRGB #colorRed #colorGreen #colorBlue 72 21
+	//check foreground no windows open
 	getColor #color1 65 795
+
 	if #colorRed < 190 and #colorRed > 120 and #color1 == #colorStatsButton
 		#recheckClanQuest = 1
 		goto :checkClanQuestReady
@@ -923,6 +944,25 @@ goto :start
 		sleep 1100
 		//endif
 	endif
+	
+	if #decline == 1
+		sleep 3500
+		//getRGB #colorRed #colorGreen #colorBlue 428 639
+		//if #colorRed == -216 or #colorGreen == -96
+		touchDown 0 200 630
+		sleep 50
+		touchUp 0
+		sleep 50
+		touchDown 0 200 630
+		sleep 50
+		touchUp 0
+		sleep 50
+		touchDown 0 200 630
+		sleep 50
+		touchUp 0
+		sleep 1100
+		//endif
+	endif
 
 	//open CQ menu
 	sleep #btnDelay
@@ -930,94 +970,158 @@ goto :start
 	sleep #btnDelay
 	touchUp 0
 	sleep #btnDelay
-	sleep 250
-	sleep 250
-	
+	sleep 500
+
 	//touch clan icon bottom
 	touchDown 0 110 720
 	sleep #btnDelay
 	touchUp 0
 	sleep #loadingClanQuestDelay
-	
 	sleep 3000
-	//check titan progress if still active or basically if you can hit titan
-	getRGB #colorRed #colorGreen #colorBlue 0 0
+
+	//check for Blue fight button lower right
+	getRGB #colorRed #colorGreen #colorBlue 390 715
 	//420 725
 	//420 730
-	
-	//if #color1 == -1785765 and #clanQuestCount == 0
-	
+
+	//if #color1 == -1785765
+	if #colorGreen != #clanBlueG or #colorBlue != #clanBlueB
 		#recheckClanQuest = 0
 		goto :clanQuestClose
 	endif
-	
+
 	//check boss HP > 0
 	getRGB #colorRed #colorGreen #colorBlue 116 145
-	
-	#clanQuestLoopCount = 0
-	
-	if #colorRed == 0 or #colorGreen == -77 and #colorBlue == -57
+	if #colorGreen == #clanBlueG and #colorBlue == #clanBlueB
 		//boss up
-		touchDown 0 310 740
+		touchDown 0 390 715
 		sleep #btnDelay
 		touchUp 0
 		sleep #menuPopUpDelay
-		goto :clanQuestCheckDias
-	elseif #color1 == 0
-		//boss down
-		#recheckClanQuest = 0
+		sleep #menuPopUpDelay
+		goto :clanQuestCheckDecks
 	endif
 
-	//close (and recheck)
+	//boss down
+	#recheckClanQuest = 0
 goto :clanQuestClose
 
-:clanQuestCheckDias
-	getColor #color1 40 215
-	
-	if #color1 == -7775689
-		//no dias left
+:clanQuestCheckDecks
+	if #deckSlotCount > 3
+		#deckSlotX = 115
+		#deckSlotCount = 1
 		#recheckClanQuest = 0
 		goto :clanQuestClose
-	else
-		touchDown 0 325 450
-		//330 450
-		sleep #btnDelay
-		touchUp 0
-		
-		sleep 3000
-		getColor #color1 20 770
-		
-		goto :clanQuestHit
 	endif
+
+	//on first run, tap on deck 1
+	//other runs, adjusted to hit appropriate deck slot
+	touchPress 0 #deckSlotX #deckSlotY
+	sleep #btnDelay
+	touchPress 0 #deckSlotX #deckSlotY
+	sleep #btnDelay
+	touchPress 0 #deckSlotX #deckSlotY
+	sleep #btnDelay
+	touchPress 0 #deckSlotX #deckSlotY
+	sleep #btnDelay
+	sleep #btnDelay
+
+	//initiate hit
+	touchPress 0 360 530
+	sleep #btnDelay
+	touchPress 0 360 530
+	sleep #btnDelay
+	touchPress 0 360 530
+	sleep #btnDelay
+	touchPress 0 360 530
+	sleep #btnDelay
+	
+	//wait to load titan screen
+	sleep 2400
+goto :clanQuestHit
 	
 :clanQuestHit
-	if #color1 == -28929 and #clanQuestLoopCount == 0
-		//add quest
-		#clanQuestCount = #clanQuestCount + 1
-	endif
-
-	#clanQuestLoopCount = #clanQuestLoopCount + 1
-	
-	if #color1 == -28929 and #clanQuestLoopCount < 1000
-		//hit the boss
-		touchDown 0 180 730
+	if #knees == 1
+		touchDown 0 #kneeL #kneeY
 		touchUp 0
 		sleep 28
-		goto :clanQuestHit
-	elseif #clanQuestLoopCount > 950
-		goto :clanQuestClose
+		#hitCount = #hitCount + 1
+		touchDown 0 #kneeR #kneeY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
 	endif
 
+	if #shoulders == 1
+		touchDown 0 #armL #shoulderY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+		touchDown 0 #armR #shoulderY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+	endif
+
+	if #hands == 1
+		touchDown 0 #armL #handY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+		touchDown 0 #armR #handY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+	endif
+
+	if #head == 1
+		touchDown 0 #bodyX #torsoY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+	endif
+
+	if #torso == 1
+		touchDown 0 #bodyX #headY
+		touchUp 0
+		sleep 28
+		#hitCount = #hitCount + 1
+	endif
+
+	if #hitCount < #hitTotal
+		goto :clanQuestHit
+	endif
+goto :clanQuestHitExit
+
+:clanQuestHitExit
+	//if Continue is not yet present, continue hitting
+	//possibly due to titan death + transition to new titan
+	getRGB #colorRed #colorGreen #colorBlue 300 615
+	if #colorGreen != #clanBlueG or #colorBlue != #clanBlueB
+		//estimated value, additional 3 seconds
+		//unsure of actual titan transition time, please correct me
+		#hitTotal = 103
+		goto :clanQuestHit
+	endif
+	
+	#hitTotal = 1055
+	#deckSlotX = #deckSlotX + #deckSlotDiff * deckSlotCount
+	#deckSlotCount = #deckSlotCount + 1
+goto :clanQuestCheckDecks
+
 :clanQuestClose
+	//is it closed already?
 	getColor #color1 65 788
 	if #color1 == #colorStatsButton
+		//yes
 		goto :clanQuestCloseCheck
 	else
-		touchDown 0 415 45
+		//no
+		touchDown 0 410 65
 		sleep 35
 		touchUp 0
 		sleep 200
-		touchDown 0 420 210
+		touchDown 0 405 65
 		sleep 35
 		touchUp 0
 		sleep 200
@@ -1025,10 +1129,9 @@ goto :clanQuestClose
 	endif
 	
 :clanQuestCloseCheck
-	if #recheckClanQuest == 1 and #clanQuestCount < #clanQuestRunsPerReadyUp
+	if #recheckClanQuest == 1
 		goto :checkClanQuestReady
 	else
-		#clanQuestCount = 0
 		goto :start
 	endif
 
