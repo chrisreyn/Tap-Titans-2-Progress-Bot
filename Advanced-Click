@@ -1,4 +1,4 @@
-// May 11, 2019
+// May 11, 2019 ver 2
 // -  Tap Titans 2 AdvancedClickBot by Tune389 [ v1.3 dev 1]
 // edited by djo5296 '17-12-30
 // now fully handled by chrisreyn
@@ -266,7 +266,7 @@ var #handY 475
 var #bodyX 240
 var #headY 275
 var #torsoY 425
-var #hitCount 0
+var #raidHitCount 0
 var #hitTotal 1055
 // ---------- MAIN
 :start
@@ -1040,50 +1040,50 @@ goto :clanQuestHit
 		touchDown 0 #kneeL #kneeY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 		touchDown 0 #kneeR #kneeY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 	endif
 
 	if #shoulders == 1
 		touchDown 0 #armL #shoulderY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 		touchDown 0 #armR #shoulderY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 	endif
 
 	if #hands == 1
 		touchDown 0 #armL #handY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 		touchDown 0 #armR #handY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 	endif
 
 	if #head == 1
 		touchDown 0 #bodyX #torsoY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 	endif
 
 	if #torso == 1
 		touchDown 0 #bodyX #headY
 		touchUp 0
 		sleep 28
-		#hitCount = #hitCount + 1
+		#raidHitCount = #raidHitCount + 1
 	endif
 
-	if #hitCount < #hitTotal
+	if #raidHitCount < #hitTotal
 		goto :clanQuestHit
 	endif
 goto :clanQuestHitExit
@@ -1095,10 +1095,11 @@ goto :clanQuestHitExit
 	if #colorGreen != #clanBlueG or #colorBlue != #clanBlueB
 		//estimated value, additional 3 seconds
 		//unsure of actual titan transition time, please correct me
+		#raidHitCount = 0
 		#hitTotal = 103
 		goto :clanQuestHit
 	endif
-	
+	#raidHitCount = 0
 	#hitTotal = 1055
 	#deckSlotX = #deckSlotX + #deckSlotDiff * deckSlotCount
 	#deckSlotCount = #deckSlotCount + 1
@@ -1161,12 +1162,16 @@ goto :checkClanQuestReady2
 				sleep #menuSlideDelay
 				getRGB #colorRed #colorGreen #colorBlue 330 480
 				if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76
-					sleep 300
-					goto :openSwordMasterTab
+					if #loopBreak < 5
+						#loopBreak = #loopBreak + 1
+						sleep 300
+						goto :openSwordMasterTab
+					endif
 				endif
 				#time = #time + #btnDelay + 100
 				#time = #time + #btnDelay
 				#time = #time + #menuSlideDelay
+				#loopBreak = 0
 			endif
 			
 			//slide top
