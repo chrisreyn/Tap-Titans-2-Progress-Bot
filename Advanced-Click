@@ -1,4 +1,4 @@
-// May 11, 2019 ver 2
+// May 13, 2019
 // -  Tap Titans 2 AdvancedClickBot by Tune389 [ v1.3 dev 1]
 // edited by djo5296 '17-12-30
 // now fully handled by chrisreyn
@@ -31,9 +31,14 @@ var #lateRun 0
 // if #lateRun > 0, will resume run at #minutes = #lateRun
 // 2nd run onwards (aka after prestige) will NOT adjust time
 
-var #prestigeStartTime 40
+var #prestigeStartTime 45
 // input minimum time in minutes before prestige
 // prestige time range is ALWAYS +10 more minutes greater than StartTime to prevent teapot
+
+var #dump 0
+//dumps relics all into BoS
+//only fully works if you set relic input to MAX
+//be careful, after many many runs, arti list might be jumbled up
 // ---------- Actions ---------- [ General ]
 var #runActionsEveryXSeconds 94
 
@@ -44,7 +49,10 @@ var #runActionsOnStart 1
 var #changeHelmVARIABLE 1
 var #gear1 2
 var #gear2 1
-var #timeChangeHelm 35
+var #timeChangeHelm 37
+//be sure to have your desired equipemnts in the first 3 slots
+//and that your helm list is scrolled to the top
+//new equipemnt sometimes gets inserted at the top of the helm list, ruining expected equip
 // ---------- Actions ---------- [ ClanQuest ]
 var #enableClanQuest 1
 
@@ -394,6 +402,51 @@ goto :switchHelm2
 		sleep #menuSlideDelay
 		#changeHelmVARIABLE = 1
 	endif
+goto :dumpRelics
+
+:dumpRelics
+	if #dump == 1
+		sleep 300
+		//open relics tab
+		sleep #btnDelay
+		touchDown 0 360 #menuY
+		sleep #btnDelay
+		touchUp 0
+		sleep 20
+
+		//wait for menu open
+		sleep #menuSlideDelay
+
+		//check if opened right
+		sleep #menuSlideDelay
+		getRGB #colorRed #colorGreen #colorBlue 330 480
+		if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76
+			if #loopBreak < 4
+				#loopBreak = #loopBreak + 1
+				sleep 300
+				goto :dumpRelics
+			endif
+		endif
+		#loopBreak = 0
+
+		//tap BoS
+		touchPress 0 410 650
+		sleep #btnDelay
+		touchPress 0 410 650
+		sleep #btnDelay
+		touchPress 0 410 650
+		sleep #btnDelay
+		touchPress 0 410 650
+		sleep #btnDelay
+
+		//close menu
+		sleep #btnDelay
+		touchPress 0 #menuCloseX #menuCloseY
+		touchPress 0 #menuCloseX #menuCloseY
+		touchPress 0 #menuCloseX #menuCloseY
+		sleep #menuSlideDelay
+	endif
+
 goto :init
 // ---------- INIT
 :init
@@ -868,7 +921,7 @@ goto :start
 	sleep #btnDelay
 	touchUp 0
 	sleep #btnDelay
-	sleep 500
+	sleep 1500
 
 	//touch clan icon bottom
 	touchDown 0 110 720
@@ -989,8 +1042,9 @@ goto :clanQuestHitExit
 :clanQuestHitExit
 	//if Continue is not yet present, continue hitting
 	//possibly due to titan death + transition to new titan
+	toast checking for Continue
 	getRGB #colorRed #colorGreen #colorBlue 300 615
-	if #colorGreen != #clanBlueG or #colorBlue != #clanBlueB
+	if #colorRed != -216 or #colorGreen != -94  or #colorBlue != -53
 		//estimated value, additional 3 seconds
 		//unsure of actual titan transition time, please correct me
 		#raidHitCount = 0
@@ -1001,7 +1055,27 @@ goto :clanQuestHitExit
 	#hitTotal = 1055
 	#deckSlotX = #deckSlotX + #deckSlotDiff * deckSlotCount
 	#deckSlotCount = #deckSlotCount + 1
-	sleep 30000
+
+	sleep #btnDelay
+	touchDown 0 300 615
+	sleep #btnDelay
+	touchUp 0
+	sleep #btnDelay
+	touchDown 0 300 615
+	sleep #btnDelay
+	touchUp 0
+	sleep #btnDelay
+	touchDown 0 300 615
+	sleep #btnDelay
+	touchUp 0
+
+	sleep 10000
+	toast please wait
+	sleep 10000
+	toast a bit more
+	sleep 5000
+	toast almost there
+	sleep 5000
 
 	if #deckSlotCount > 3
 		#deckSlotX = 115
@@ -1034,6 +1108,7 @@ goto :checkClanQuestReady2
 	if #recheckClanQuest == 1
 		goto :checkClanQuestReady
 	else
+		#deckSlotCount = 1
 		goto :start
 	endif
 
@@ -2003,7 +2078,7 @@ goto :switchHelm1
 goto :runActions
 
 :switchHelm15
-	if #changeHelmVARIABLE == 1
+	if #changeHelmVARIABLE == 1 and #minutes >= #timeChangeHelm
 		sleep #btnDelay
 		touchDown 0 200 780
 		sleep #btnDelay
@@ -2018,6 +2093,7 @@ goto :runActions
 			endif
 		endif
 		#loopBreak = 0
+		//switch to helm tab
 		touchPress 0 130 545
 		sleep #btnDelay
 		touchPress 0 130 545
@@ -2026,6 +2102,7 @@ goto :runActions
 		sleep #btnDelay
 		touchPress 0 130 545
 		sleep #btnDelay
+		//tap gear
 		sleep 500
 		touchPress 0 #gearX #gear2
 		sleep #btnDelay
