@@ -1,4 +1,4 @@
-// May 13, 2019
+// May 16, 2019
 // -  Tap Titans 2 AdvancedClickBot by Tune389 [ v1.3 dev 1]
 // edited by djo5296 '17-12-30
 // now fully handled by chrisreyn
@@ -31,7 +31,7 @@ var #lateRun 0
 // if #lateRun > 0, will resume run at #minutes = #lateRun
 // 2nd run onwards (aka after prestige) will NOT adjust time
 
-var #prestigeStartTime 45
+var #prestigeStartTime 55
 // input minimum time in minutes before prestige
 // prestige time range is ALWAYS +10 more minutes greater than StartTime to prevent teapot
 
@@ -46,15 +46,15 @@ var #runActionsOnStart 1
 // 1 = (default) run actions on script start
 // 0 = run actions after given run time above
 // ---------- Actions ---------- [ Change Helm ]
-var #changeHelmVARIABLE 1
-var #gear1 2
+var #changeHelmVARIABLE 4
+var #gear1 3
 var #gear2 1
-var #timeChangeHelm 37
+var #timeChangeHelm 45
 //be sure to have your desired equipemnts in the first 3 slots
 //and that your helm list is scrolled to the top
 //new equipemnt sometimes gets inserted at the top of the helm list, ruining expected equip
 // ---------- Actions ---------- [ ClanQuest ]
-var #enableClanQuest 1
+var #enableClanQuest 0
 
 var #head 1
 var #torso 1
@@ -66,6 +66,10 @@ var #enableHeroes 1
 var #heroIntensity 2
 var #topHeroes 0
 //level top hero every X seconds, leave at 0 to disable
+var #skipScroll 1
+//at (#prestigeAfterXMinutes - 3), stop scrolling down when hero upgrade
+//also only when #prestigeAfterXMinutes >= #prestigeStartTime + 3
+//useful for very late players
 // ---------- Actions ---------- [ Skills ]
 var #enableSkills 1
 var #skipHS 0
@@ -222,6 +226,7 @@ var #colorGray 2695200
 var #timeLastActionRun 0
 var #timeDiff 0
 var #time 0
+calc #time2 #prestigeAfterXMinutes - 3
 var #seconds 0
 var #secondsTotal 0
 var #minutes 0
@@ -296,7 +301,80 @@ var #hitTotal 1055
 		sleep 30
 		#time = #time + 60
 	endif
+goto :start2
 
+:start2
+	if #changeHelmVARIABLE == 4 and #showCurrentTime == 1 and #resultUpdateTime == 0
+		toast will change helm later
+	elseif #showCurrentTime == 1 and #resultUpdateTime == 0
+		toast done changing
+	endif
+
+	if #minutes >= #timeChangeHelm
+		sleep 100
+		toast checking minutes
+		goto :helmSwitch1
+	endif
+goto :start3
+
+:helmSwitch1
+	if #changeHelmVARIABLE == 4
+		sleep #btnDelay
+		touchDown 0 200 780
+		sleep #btnDelay
+		touchUp 0
+		sleep 20
+		sleep 880
+
+		getRGB #colorRed #colorGreen #colorBlue 330 480
+		if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76
+			if #loopBreak < 8
+				#loopBreak = #loopBreak + 1
+				sleep 300
+				goto :helmSwitch1
+			endif
+		endif
+		#loopBreak = 0
+
+		//switch to helm tab
+		touchPress 0 130 545
+		sleep #btnDelay
+		touchPress 0 130 545
+		sleep #btnDelay
+		touchPress 0 130 545
+		sleep #btnDelay
+		touchPress 0 130 545
+		sleep #btnDelay
+		goto :helmSwitch15
+	endif
+goto :start3
+
+:helmSwitch15
+	if #changeHelmVARIABLE == 4
+		//equip secondary gear
+		sleep 500
+		touchPress 0 #gearX #gear2
+		sleep #btnDelay
+		touchPress 0 #gearX #gear2
+		sleep #btnDelay
+		touchPress 0 #gearX #gear2
+		sleep #btnDelay
+		touchPress 0 #gearX #gear2
+		sleep #btnDelay
+
+		//close
+		touchPress 0 #menuCloseX #menuCloseY
+		touchPress 0 #menuCloseX #menuCloseY
+		touchPress 0 #menuCloseX #menuCloseY
+		sleep #menuSlideDelay
+
+		#changeHelmVARIABLE = 2
+		toast done changing
+		sleep #btnDelay
+	endif
+goto :start3
+
+:start3
 	if #resultUpdateTime == 0 and #enablePremiumCollect == 1 and #decline == 1
 		touchDown 0 195 630
 		sleep 30
@@ -351,11 +429,12 @@ var #hitTotal 1055
 	#intervalWC = #iWC
 	#intervalSC = #iSC
 	rand #prestigeAfterXMinutes #prestigeStartTime #prestigeEndTime
-goto :switchHelm2
+	#time2 = #prestigeAfterXMinutes - 3
+goto :helmSwitch2
 
-:switchHelm2
+:helmSwitch2
 	if #changeHelmVARIABLE == 2
-		sleep 100
+		sleep 300
 		//open equipment tab
 		sleep #btnDelay
 		touchDown 0 200 780
@@ -371,11 +450,11 @@ goto :switchHelm2
 			if #loopBreak < 4
 				sleep 300
 				#loopBreak = #loopBreak + 1
-				goto :switchHelm2
+				goto :helmSwitch2
 			endif
 		endif
-		//open helm tab
 		#loopBreak = 0
+		//open helm tab
 		touchPress 0 130 545
 		sleep #btnDelay
 		touchPress 0 130 545
@@ -385,7 +464,12 @@ goto :switchHelm2
 		touchPress 0 130 545
 		sleep #btnDelay
 		sleep 500
-		//equip 2nd gear
+	endif
+goto :helmSwitch25
+
+:helmSwitch25
+	if #changeHelmVARIABLE == 2
+		//equip main gear
 		touchPress 0 #gearX #gear1
 		sleep #btnDelay
 		touchPress 0 #gearX #gear1
@@ -400,7 +484,7 @@ goto :switchHelm2
 		touchPress 0 #menuCloseX #menuCloseY
 		touchPress 0 #menuCloseX #menuCloseY
 		sleep #menuSlideDelay
-		#changeHelmVARIABLE = 1
+		#changeHelmVARIABLE = 4
 	endif
 goto :dumpRelics
 
@@ -855,7 +939,7 @@ goto :checkPrestigeB
 		touchDown 0 330 535
 		sleep #btnDelay
 		touchUp 0
-		sleep 20000
+		sleep 25000
 		goto :afterPrestige
 	else
 		touchPress 470 450
@@ -1021,14 +1105,14 @@ goto :clanQuestHit
 	endif
 
 	if #head == 1
-		touchDown 0 #bodyX #torsoY
+		touchDown 0 #bodyX #headY
 		touchUp 0
 		sleep 28
 		#raidHitCount = #raidHitCount + 1
 	endif
 
 	if #torso == 1
-		touchDown 0 #bodyX #headY
+		touchDown 0 #bodyX #torsoY
 		touchUp 0
 		sleep 28
 		#raidHitCount = #raidHitCount + 1
@@ -1053,7 +1137,7 @@ goto :clanQuestHitExit
 	endif
 	#raidHitCount = 0
 	#hitTotal = 1055
-	#deckSlotX = #deckSlotX + #deckSlotDiff * deckSlotCount
+	#deckSlotX = #deckSlotX + #deckSlotDiff * #deckSlotCount
 	#deckSlotCount = #deckSlotCount + 1
 
 	sleep #btnDelay
@@ -1489,6 +1573,7 @@ goto :checkSkillsSlideDown
 
 :checkSkillsSlideDown
 	//slide
+	toast slide down
 	touchDown 1 280 750
 	sleep 200
 	touchMove 1 280 725
@@ -1559,6 +1644,7 @@ goto :levelHeroes2
 
 :levelHeroes2
 	//open menu
+	sleep #btnDelay
 	sleep #btnDelay
 
 	touchDown 0 #menuHeroes #menuY
@@ -1701,6 +1787,10 @@ goto :scrollTop
 	touchPress 0 460 670
 	sleep #btnDelay
 	#time = #time + #btnDelay * 7
+
+	if #skipScroll == 1 and #minutes >= #time2 and #time2 >= #prestigeStartTime
+		goto :levelHeroesPressLevelUp
+	endif
 
 	//lvl up only nearby heroes at this time onwards
 	//edit as you see fit
@@ -2045,7 +2135,8 @@ goto :levelHeroesSlideUpCollection
 	touchPress 0 #menuCloseX #menuCloseY
 	sleep #menuSlideDelay
 	#time = #time + #menuSlideDelay
-	if #detour == 1
+
+	if #detour == 1 and #minutes < 5
 		sleep 400
 		#lastPressHS = -200
 		#lastPressDS = -200
@@ -2055,75 +2146,16 @@ goto :levelHeroesSlideUpCollection
 		#lastPressWC = -200
 
 		//click "Fight Boss"
-		touchPress 0 390 36
-		sleep 40
-		touchUp
-		sleep 40
-
+		getColor #color1 372 24
+		if #color1 == 1076975
+			touchPress 0 390 36
+			sleep 40
+			touchUp
+			sleep 40
+		endif
 		goto :pressSkills
 	endif
-goto :switchHelm1
-
-:switchHelm1
-	if #changeHelmVARIABLE == 2
-		toast done changing
-	else
-		toast change helm now??
-	endif
-	if #minutes >= #timeChangeHelm
-		sleep 100
-		toast checking minutes
-		goto :switchHelm15
-	endif
 goto :runActions
-
-:switchHelm15
-	if #changeHelmVARIABLE == 1 and #minutes >= #timeChangeHelm
-		sleep #btnDelay
-		touchDown 0 200 780
-		sleep #btnDelay
-		touchUp 0
-		sleep 900
-		getRGB #colorRed #colorGreen #colorBlue 330 480
-		if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76
-			if #loopBreak < 4
-				sleep 300
-				#loopBreak = #loopBreak + 1
-				goto :switchHelm15
-			endif
-		endif
-		#loopBreak = 0
-		//switch to helm tab
-		touchPress 0 130 545
-		sleep #btnDelay
-		touchPress 0 130 545
-		sleep #btnDelay
-		touchPress 0 130 545
-		sleep #btnDelay
-		touchPress 0 130 545
-		sleep #btnDelay
-		//tap gear
-		sleep 500
-		touchPress 0 #gearX #gear2
-		sleep #btnDelay
-		touchPress 0 #gearX #gear2
-		sleep #btnDelay
-		touchPress 0 #gearX #gear2
-		sleep #btnDelay
-		touchPress 0 #gearX #gear2
-		sleep #btnDelay
-		if #changeHelmVARIABLE == 1 and #minutes > 23
-			#changeHelmVARIABLE = 2
-			toast done changing
-		endif
-		sleep #btnDelay
-		touchPress 0 #menuCloseX #menuCloseY
-		touchPress 0 #menuCloseX #menuCloseY
-		touchPress 0 #menuCloseX #menuCloseY
-		sleep #menuSlideDelay
-	endif
-goto :runActions
-
 // ---------- CHECK BOSS
 :checkBoss
 	getColor #color1 139 85
