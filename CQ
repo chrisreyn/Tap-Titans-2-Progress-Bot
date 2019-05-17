@@ -1,8 +1,7 @@
-// May 10, 2019
+// May 16, 2019
 // -  Tap Titans 2 -
 // Clan Raid
 // by chrisreyn
-
 
 // ---------- Body Part Selection
 var #head 1
@@ -10,7 +9,6 @@ var #torso 1
 var #shoulders 1
 var #hands 1
 var #knees 1
-
 
 // ---------- Variables (do not touch)
 var #kneeL 155
@@ -28,8 +26,6 @@ var #torsoY 425
 
 var #hitCount 0
 var #hitTotal 1053
-
-
 // ---------- MAIN
 :start
 if #knees == 1
@@ -66,14 +62,14 @@ if #hands == 1
 endif
 
 if #head == 1
-	touchDown 0 #bodyX #torsoY
+	touchDown 0 #bodyX #headY
 	touchUp 0
 	sleep 28
 	#hitCount = #hitCount + 1
 endif
 
 if #torso == 1
-	touchDown 0 #bodyX #headY
+	touchDown 0 #bodyX #torsoY
 	touchUp 0
 	sleep 28
 	#hitCount = #hitCount + 1
