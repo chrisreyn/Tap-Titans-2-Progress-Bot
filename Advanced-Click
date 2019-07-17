@@ -1,4 +1,4 @@
-// May 16, 2019
+// July 17, 2019
 // -  Tap Titans 2 AdvancedClickBot by Tune389 [ v1.3 dev 1]
 // edited by djo5296 '17-12-30
 // now fully handled by chrisreyn
@@ -31,7 +31,7 @@ var #lateRun 0
 // if #lateRun > 0, will resume run at #minutes = #lateRun
 // 2nd run onwards (aka after prestige) will NOT adjust time
 
-var #prestigeStartTime 55
+var #prestigeStartTime 45
 // input minimum time in minutes before prestige
 // prestige time range is ALWAYS +10 more minutes greater than StartTime to prevent teapot
 
@@ -47,9 +47,11 @@ var #runActionsOnStart 1
 // 0 = run actions after given run time above
 // ---------- Actions ---------- [ Change Helm ]
 var #changeHelmVARIABLE 4
-var #gear1 3
-var #gear2 1
-var #timeChangeHelm 45
+//4 = on
+//0 = off
+var #gear1 1
+var #gear2 3
+var #timeChangeHelm 50
 //be sure to have your desired equipemnts in the first 3 slots
 //and that your helm list is scrolled to the top
 //new equipemnt sometimes gets inserted at the top of the helm list, ruining expected equip
@@ -219,9 +221,10 @@ var #colorDia -7970303
 var #colorLevelUpAvailable 1338350
 var #skillGray 7829367
 var #skillBlue -3693762
-var #colorBlack 397861
+var #colorBlack 660003
 var #colorStatsButton 3695603
 var #colorGray 2695200
+var #fightBoss 1077231
 // ---------- TimeSets
 var #timeLastActionRun 0
 var #timeDiff 0
@@ -305,12 +308,12 @@ goto :start2
 
 :start2
 	if #changeHelmVARIABLE == 4 and #showCurrentTime == 1 and #resultUpdateTime == 0
-		toast will change helm later
-	elseif #showCurrentTime == 1 and #resultUpdateTime == 0
+		toast will change helm at #timeChangeHelm minutes
+	elseif #changeHelmVARIABLE == 2 and #showCurrentTime == 1 and #resultUpdateTime == 0
 		toast done changing
 	endif
 
-	if #minutes >= #timeChangeHelm
+	if #minutes >= #timeChangeHelm and #showCurrentTime == 1 and #resultUpdateTime == 0
 		sleep 100
 		toast checking minutes
 		goto :helmSwitch1
@@ -581,7 +584,7 @@ goto :start
 :pressSkills
 	//click "Fight Boss"
 	getColor #color1 372 24
-	if #color1 == 1076975 and #loopBreak < 5
+	if #color1 == #fightBoss and #loopBreak < 5
 		toast FightBoss1
 		touchPress 0 390 36
 		sleep 40
@@ -1361,7 +1364,7 @@ goto :checkSkillsB
 		#time = #time + 115
 	endif
 
-	if #manualMax < 11
+	if #manualMax < 12
 		goto :checkSkillsB
 	else
 		#manualMax = 0
@@ -2155,6 +2158,20 @@ goto :levelHeroesSlideUpCollection
 		endif
 		goto :pressSkills
 	endif
+
+	//click "Fight Boss"
+	getColor #color1 372 24
+	if #color1 == #fightBoss and #loopBreak < 5
+		toast FightBoss1
+		touchPress 0 390 36
+		sleep 40
+		touchUp
+		sleep 40
+		#loopBreak = #loopBreak + 1
+		#time = #time + 80
+		goto :closeMenu
+	endif
+	#loopBreak = 0
 goto :runActions
 // ---------- CHECK BOSS
 :checkBoss
@@ -2203,7 +2220,7 @@ goto :pressSkills
 
 :startBossWithSkills
 	getColor #color1 372 24
-	if #color1 == 1204718
+	if #color1 == #fightBoss
 		toast FightBoss3
 		touchPress 0 390 36
 		sleep 300
@@ -2228,24 +2245,20 @@ goto :pressSkills
 	if #startBossSkill == 2
 		touchPress 0 120 710
 		sleep 200
-		goto :startBossWithSecondarySkill
 	elseif #startBossSkill == 3
 		touchPress 0 200 710
 		sleep 200
-		goto :startBossWithSecondarySkill
 	elseif #startBossSkill == 4
 		touchPress 0 280 710
 		sleep 200
-		goto :startBossWithSecondarySkill
 	elseif #startBossSkill == 5
 		touchPress 0 360 710
 		sleep 200
-		goto :startBossWithSecondarySkill
 	elseif #startBossSkill == 6
 		touchPress 0 430 710
 		sleep 200
-		goto :startBossWithSecondarySkill
 	endif
+goto :startBossWithSecondarySkill
 
 :startBossWithSecondarySkill
 	if #startBossSecondarySkill == 2

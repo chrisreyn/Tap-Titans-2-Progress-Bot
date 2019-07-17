@@ -1,6 +1,6 @@
 // -  Tap Titans 2 RandomClicker by Tune389 [ v1 ]
 // edited by djo5296 '17-12-23 v2
-// chrisreyn Push May 16, 2019
+// chrisreyn Push July 17, 2019
 
 //THIS SCRIPT HAS NO PRESTIGE, NO SKILL LEVEL UP (just activate), ONLY RECENT HERO LEVEL UP
 
@@ -15,7 +15,7 @@ var #startY 160
 // use 160 if w/ faries
 // use 270 if no faries
 
-var #skipScroll 1
+var #skipScroll 0
 var #enableCO 1
 var #PHoM 1
 var #equipmentStacking 0
@@ -24,7 +24,7 @@ var #decline 0
 // agree = 1 if you want to auto accept fairy ads; aka skippable fairy ads
 // decline = 1 if you cannot turn off fairy ads but want to click on all fairies
 // you can leave both at 0 if you turn off fairy ads (change #startY if so)
-// do not make both agree and decline = 1 hahaha
+// do not make both #agree and #decline = 1 hahaha
 // ---------- Actions ---------- [ ClanQuest ]
 var #enableClanQuest 0
 
@@ -85,6 +85,7 @@ var #colorGreen 0
 var #colorBlue 0
 var #colorGray 2695200
 var #colorStatsButton 3695603
+var #fightBoss 1077231
 if #startHeroLevelUpNow == 1
 	#hitCount = 1199
 endif
@@ -424,7 +425,7 @@ goto :extra
 
 	//click "Fight Boss"
 	getColor #color1 372 24
-	if #color1 == 1076975
+	if #color1 == #fightBoss
 		toast FightBoss1
 		touchPress 0 390 36
 		sleep 40
