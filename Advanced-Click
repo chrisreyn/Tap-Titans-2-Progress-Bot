@@ -361,7 +361,7 @@ goto :switchHelm2
 		//check if opened right
 		sleep #menuSlideDelay
 		getRGB #colorRed #colorGreen #colorBlue 330 480
-		if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76 or #loopBreak < 5
+		if #colorRed != 85 or #colorGreen != 82 or #colorBlue != 81 or #loopBreak < 5
 			sleep 300
 			#loopBreak = #loopBreak + 1
 			goto :switchHelm2
@@ -875,21 +875,21 @@ goto :checkPrestigeB
 	touchUp 0
 	sleep #menuPopUpDelay
 	sleep 120
-	getColor #color1 430 540
-	if #color1 == 6384245
-		touchDown 0 330 535
-		sleep #btnDelay
-		touchUp 0
-		sleep 20000
-		goto :afterPrestige
-	else
-		touchPress 470 450
-		touchPress 470 450
-		touchPress 470 450
-		touchPress 470 450
-		#prestigeSlide = 0
-		goto :checkPrestige
-	endif 
+	getColor #color1 350 550
+if #color1 == -4089562
+	touchDown 0 330 535
+	sleep #btnDelay
+	touchUp 0
+	sleep 17000
+	goto :afterPrestige
+else
+	touchPress 350 550
+	touchPress 350 550
+	touchPress 350 550
+	touchPress 350 550
+	#prestigeSlide = 0
+	goto :checkPrestige
+endif 
 goto :start
 
 // ---------- CHECK CLAN QUEST
@@ -1054,7 +1054,7 @@ goto :clanQuestClose
 				//check if opened right
 				sleep #menuSlideDelay
 				getRGB #colorRed #colorGreen #colorBlue 330 480
-				if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76
+				if #colorRed != 85 or #colorGreen != 82 or #colorBlue != 81
 					sleep 300
 					goto :openSwordMasterTab
 				endif
@@ -1491,7 +1491,7 @@ goto :levelHeroes2
 	//check if opened right
 	sleep 600
 	getRGB #colorRed #colorGreen #colorBlue 330 480
-	if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76 or #loopBreak < 4
+	if #colorRed != 85 or #colorGreen != 82 or #colorBlue != 81 or #loopBreak < 4
 		sleep 300
 		#loopBreak = #loopBreak + 1
 		goto :levelHeroes2
@@ -2003,7 +2003,7 @@ goto :runActions
 		touchUp 0
 		sleep 900
 		getRGB #colorRed #colorGreen #colorBlue 330 480
-		if #colorRed != 84 or #colorGreen != 76 or #colorBlue != 76 or #loopBreak < 5
+		if #colorRed != 85 or #colorGreen != 82 or #colorBlue != 81 or #loopBreak < 5
 			sleep 300
 			#loopBreak = #loopBreak + 1
 			goto :switchHelm15
